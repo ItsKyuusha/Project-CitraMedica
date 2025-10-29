@@ -21,7 +21,7 @@
         <!-- /.login-logo -->
         <div class="card card-outline card-primary">
             <div class="card-header text-center">
-                <a href="#" class="h1"><b>Poliklinik</b></br>Citra Medica</a>
+                <img src="{{ asset('Citra Medica full-rmvbg.png') }}" alt="Citra Medica Logo" class="img-fluid" style="max-width: 100px;">
             </div>
             <div class="card-body">
                 <p class="login-box-msg">Sign in to start your session</p>
