@@ -13,22 +13,35 @@ use Illuminate\Support\Facades\Hash;
 
 class DokterController extends Controller
 {
-    // === Dashboard Dokter ===
     public function index()
     {
         $dokterId = Auth::user()->dokter->id;
 
+        // Total Pasien Sudah Diperiksa
         $totalSelesai = Periksa::whereHas('jadwal', function ($q) use ($dokterId) {
             $q->where('dokter_id', $dokterId);
         })->where('status', 'selesai')->count();
 
+        // Total Pasien Belum Diperiksa
         $totalBelum = Periksa::whereHas('jadwal', function ($q) use ($dokterId) {
             $q->where('dokter_id', $dokterId);
         })->where('status', '!=', 'selesai')->count();
 
-        return view('dokter.dashboard', compact('totalSelesai', 'totalBelum'));
-    }
+        // Total Pemeriksaan (Jumlah Pasien Sudah dan Belum Diperiksa)
+        $totalPemeriksaan = $totalSelesai + $totalBelum;
 
+        // Data untuk Chart (Contoh: Jumlah per bulan)
+        $dokterData = Periksa::whereHas('jadwal', function ($q) use ($dokterId) {
+            $q->where('dokter_id', $dokterId);
+        })
+        ->selectRaw('YEAR(updated_at) as year, MONTH(updated_at) as month, count(*) as count')
+        ->groupBy('year', 'month')
+        ->orderBy('year', 'desc')
+        ->orderBy('month', 'desc')
+        ->get();
+
+        return view('dokter.dashboard', compact('totalSelesai', 'totalBelum', 'totalPemeriksaan', 'dokterData'));
+    }
 
     // === Tampilkan Daftar Pemeriksaan (untuk dokter yang login) ===
     public function showPeriksa()
