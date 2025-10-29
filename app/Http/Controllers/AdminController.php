@@ -17,19 +17,42 @@ class AdminController extends Controller
     // Pastikan sudah ada use ini di atas
 
     public function index()
-    {
-        $jumlahDokter = Dokter::count();
-        $jumlahPasien = Pasien::count();
-        $jumlahPoli   = Poli::count();
-        $jumlahObat   = Obat::count(); // ✅ Tambahan
+{
+    $jumlahDokter = Dokter::count();
+    $jumlahPasien = Pasien::count();
+    $jumlahPoli   = Poli::count();
+    $jumlahObat   = Obat::count();
+    
+    // Data untuk chart (Misalnya, kita akan menampilkan jumlah berdasarkan tahun)
+    $dokterData = Dokter::selectRaw('YEAR(created_at) as year, count(*) as count')
+                        ->groupBy('year')
+                        ->orderBy('year')
+                        ->get();
+    $pasienData = Pasien::selectRaw('YEAR(created_at) as year, count(*) as count')
+                        ->groupBy('year')
+                        ->orderBy('year')
+                        ->get();
+    $poliData = Poli::selectRaw('YEAR(created_at) as year, count(*) as count')
+                    ->groupBy('year')
+                    ->orderBy('year')
+                    ->get();
+    $obatData = Obat::selectRaw('YEAR(created_at) as year, count(*) as count')
+                    ->groupBy('year')
+                    ->orderBy('year')
+                    ->get();
+    
+    return view('admin.dashboard', compact(
+        'jumlahDokter',
+        'jumlahPasien',
+        'jumlahPoli',
+        'jumlahObat',
+        'dokterData',
+        'pasienData',
+        'poliData',
+        'obatData'
+    ));
+}
 
-        return view('admin.dashboard', compact(
-            'jumlahDokter',
-            'jumlahPasien',
-            'jumlahPoli',
-            'jumlahObat' // ✅ Tambahkan ini juga
-        ));
-    }
 
 
     // ================= DOKTER =================

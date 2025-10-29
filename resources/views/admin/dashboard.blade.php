@@ -1,4 +1,6 @@
 @include('layout.header', ['title' => 'Dashboard Admin'])
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <!-- Sidebar Menu -->
 <nav class="mt-2">
@@ -81,8 +83,7 @@
   <section class="content">
     <div class="container-fluid">
       <div class="row">
-
-        <!-- Jumlah Dokter -->
+        <!-- Row 1: Card-statistics, 4 cards in one row -->
         <div class="col-lg-3 col-6">
           <div class="small-box bg-success">
             <div class="inner">
@@ -98,7 +99,6 @@
           </div>
         </div>
 
-        <!-- Jumlah Pasien -->
         <div class="col-lg-3 col-6">
           <div class="small-box bg-info">
             <div class="inner">
@@ -114,7 +114,6 @@
           </div>
         </div>
 
-        <!-- Jumlah Poli -->
         <div class="col-lg-3 col-6">
           <div class="small-box" style="background-color: #6f42c1; color: #fff;">
             <div class="inner">
@@ -130,7 +129,6 @@
           </div>
         </div>
 
-        <!-- Jumlah Obat -->
         <div class="col-lg-3 col-6">
           <div class="small-box bg-danger">
             <div class="inner">
@@ -145,11 +143,155 @@
             </a>
           </div>
         </div>
-
       </div>
-    </div>
+
+      <!-- Row 2: Chart, 2 charts per row -->
+      <div class="row">
+          <!-- Dokter Chart -->
+          <div class="col-lg-6 col-12 mb-4">
+              <div class="card">
+                  <div class="card-header">
+                      <h4>Jumlah Dokter per Tahun</h4> <!-- Chart Title -->
+                  </div>
+                  <div class="card-body">
+                      <canvas id="dokterChart" height="150"></canvas>
+                  </div>
+              </div>
+          </div>
+
+          <!-- Pasien Chart -->
+          <div class="col-lg-6 col-12 mb-4">
+              <div class="card">
+                  <div class="card-header">
+                      <h4>Jumlah Pasien per Tahun</h4> <!-- Chart Title -->
+                  </div>
+                  <div class="card-body">
+                      <canvas id="pasienChart" height="150"></canvas>
+                  </div>
+              </div>
+          </div>
+      </div>
+
+      <div class="row">
+          <!-- Poli Chart -->
+          <div class="col-lg-6 col-12 mb-4">
+              <div class="card">
+                  <div class="card-header">
+                      <h4>Jumlah Poli per Tahun</h4> <!-- Chart Title -->
+                  </div>
+                  <div class="card-body">
+                      <canvas id="poliChart" height="150"></canvas>
+                  </div>
+              </div>
+          </div>
+
+          <!-- Obat Chart -->
+          <div class="col-lg-6 col-12 mb-4">
+              <div class="card">
+                  <div class="card-header">
+                      <h4>Jumlah Obat per Tahun</h4> <!-- Chart Title -->
+                  </div>
+                  <div class="card-body">
+                      <canvas id="obatChart" height="150"></canvas>
+                  </div>
+              </div>
+          </div>
+      </div>
   </section>
 </div>
 <!-- /.content-wrapper -->
 
 @include('layout.footer')
+<script>
+  // Dokter Chart
+  var ctxDokter = document.getElementById('dokterChart').getContext('2d');
+  var dokterChart = new Chart(ctxDokter, {
+    type: 'bar',
+    data: {
+      labels: @json($dokterData->pluck('year')),  // Pastikan ini benar
+      datasets: [{
+        label: 'Jumlah Dokter per Tahun',
+        data: @json($dokterData->pluck('count')),  // Pastikan data jumlah dokter diteruskan dengan benar
+        backgroundColor: 'rgba(75, 192, 192, 0.5)',
+        borderColor: 'rgba(75, 192, 192, 1)',
+        borderWidth: 1
+      }]
+    },
+    options: {
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
+    }
+  });
+
+  // Pasien Chart
+  var ctxPasien = document.getElementById('pasienChart').getContext('2d');
+  var pasienChart = new Chart(ctxPasien, {
+    type: 'line',
+    data: {
+      labels: @json($pasienData->pluck('year')),  // Pastikan ini benar
+      datasets: [{
+        label: 'Jumlah Pasien per Tahun',
+        data: @json($pasienData->pluck('count')),  // Pastikan data jumlah pasien diteruskan dengan benar
+        borderColor: 'rgba(54, 162, 235, 1)',
+        fill: false,
+        tension: 0.1
+      }]
+    },
+    options: {
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
+    }
+  });
+
+  // Poli Chart
+  var ctxPoli = document.getElementById('poliChart').getContext('2d');
+  var poliChart = new Chart(ctxPoli, {
+    type: 'bar',
+    data: {
+      labels: @json($poliData->pluck('year')),  // Pastikan ini benar
+      datasets: [{
+        label: 'Jumlah Poli per Tahun',
+        data: @json($poliData->pluck('count')),  // Pastikan data jumlah poli diteruskan dengan benar
+        backgroundColor: 'rgba(153, 102, 255, 0.5)',
+        borderColor: 'rgba(153, 102, 255, 1)',
+        borderWidth: 1
+      }]
+    },
+    options: {
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
+    }
+  });
+
+  // Obat Chart
+  var ctxObat = document.getElementById('obatChart').getContext('2d');
+  var obatChart = new Chart(ctxObat, {
+    type: 'line',
+    data: {
+      labels: @json($obatData->pluck('year')),  // Pastikan ini benar
+      datasets: [{
+        label: 'Jumlah Obat per Tahun',
+        data: @json($obatData->pluck('count')),  // Pastikan data jumlah obat diteruskan dengan benar
+        borderColor: 'rgba(255, 99, 132, 1)',
+        fill: false,
+        tension: 0.1
+      }]
+    },
+    options: {
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
+    }
+  });
+</script>
