@@ -134,7 +134,7 @@
         <div class="col-lg-6 col-12 mb-4">
           <div class="card">
             <div class="card-header">
-              <h4>Jumlah Pasien Sudah Diperiksa per Bulan</h4>
+              <h4>Jumlah Pasien Sudah Diperiksa</h4>
             </div>
             <div class="card-body">
               <canvas id="dokterChart1" height="150"></canvas>
@@ -146,7 +146,7 @@
         <div class="col-lg-6 col-12 mb-4">
           <div class="card">
             <div class="card-header">
-              <h4>Jumlah Pasien Belum Diperiksa per Bulan</h4>
+              <h4>Jumlah Pasien Belum Diperiksa</h4>
             </div>
             <div class="card-body">
               <canvas id="dokterChart2" height="150"></canvas>
@@ -156,11 +156,11 @@
       </div>
 
       <div class="row">
-        <!-- Chart 3: Total Pemeriksaan per Bulan -->
+        <!-- Chart 3: Total Pemeriksaan -->
         <div class="col-lg-6 col-12 mb-4">
           <div class="card">
             <div class="card-header">
-              <h4>Total Pemeriksaan per Bulan</h4>
+              <h4>Total Pemeriksaan</h4>
             </div>
             <div class="card-body">
               <canvas id="dokterChart3" height="150"></canvas>
@@ -172,7 +172,7 @@
         <div class="col-lg-6 col-12 mb-4">
           <div class="card">
             <div class="card-header">
-              <h4>Jumlah Pasien per Tahun</h4>
+              <h4>Jumlah Pasien</h4>
             </div>
             <div class="card-body">
               <canvas id="dokterChart4" height="150"></canvas>
@@ -187,7 +187,7 @@
 <!-- /.content-wrapper -->
 @include('layout.footer')
 <script>
-  // Chart Pasien Sudah Diperiksa per Bulan
+  // Chart Pasien Sudah Diperiksa
   var ctx1 = document.getElementById('dokterChart1').getContext('2d');
   var dokterChart1 = new Chart(ctx1, {
     type: 'bar',
@@ -210,7 +210,7 @@
     }
   });
 
-  // Chart Pasien Belum Diperiksa per Bulan
+  // Chart Pasien Belum Diperiksa
   var ctx2 = document.getElementById('dokterChart2').getContext('2d');
   var dokterChart2 = new Chart(ctx2, {
     type: 'bar',

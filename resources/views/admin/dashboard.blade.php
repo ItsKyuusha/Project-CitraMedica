@@ -151,7 +151,7 @@
           <div class="col-lg-6 col-12 mb-4">
               <div class="card">
                   <div class="card-header">
-                      <h4>Jumlah Dokter per Tahun</h4> <!-- Chart Title -->
+                      <h4>Jumlah Dokter</h4> <!-- Chart Title -->
                   </div>
                   <div class="card-body">
                       <canvas id="dokterChart" height="150"></canvas>
@@ -163,7 +163,7 @@
           <div class="col-lg-6 col-12 mb-4">
               <div class="card">
                   <div class="card-header">
-                      <h4>Jumlah Pasien per Tahun</h4> <!-- Chart Title -->
+                      <h4>Jumlah Pasien</h4> <!-- Chart Title -->
                   </div>
                   <div class="card-body">
                       <canvas id="pasienChart" height="150"></canvas>
@@ -177,7 +177,7 @@
           <div class="col-lg-6 col-12 mb-4">
               <div class="card">
                   <div class="card-header">
-                      <h4>Jumlah Poli per Tahun</h4> <!-- Chart Title -->
+                      <h4>Jumlah Poli</h4> <!-- Chart Title -->
                   </div>
                   <div class="card-body">
                       <canvas id="poliChart" height="150"></canvas>
@@ -189,7 +189,7 @@
           <div class="col-lg-6 col-12 mb-4">
               <div class="card">
                   <div class="card-header">
-                      <h4>Jumlah Obat per Tahun</h4> <!-- Chart Title -->
+                      <h4>Jumlah Obat</h4> <!-- Chart Title -->
                   </div>
                   <div class="card-body">
                       <canvas id="obatChart" height="150"></canvas>
@@ -210,7 +210,7 @@
     data: {
       labels: @json($dokterData->pluck('year')),  // Pastikan ini benar
       datasets: [{
-        label: 'Jumlah Dokter per Tahun',
+        label: 'Jumlah Dokter',
         data: @json($dokterData->pluck('count')),  // Pastikan data jumlah dokter diteruskan dengan benar
         backgroundColor: 'rgba(75, 192, 192, 0.5)',
         borderColor: 'rgba(75, 192, 192, 1)',
@@ -233,7 +233,7 @@
     data: {
       labels: @json($pasienData->pluck('year')),  // Pastikan ini benar
       datasets: [{
-        label: 'Jumlah Pasien per Tahun',
+        label: 'Jumlah Pasien',
         data: @json($pasienData->pluck('count')),  // Pastikan data jumlah pasien diteruskan dengan benar
         borderColor: 'rgba(54, 162, 235, 1)',
         fill: false,
@@ -256,7 +256,7 @@
     data: {
       labels: @json($poliData->pluck('year')),  // Pastikan ini benar
       datasets: [{
-        label: 'Jumlah Poli per Tahun',
+        label: 'Jumlah Poli',
         data: @json($poliData->pluck('count')),  // Pastikan data jumlah poli diteruskan dengan benar
         backgroundColor: 'rgba(153, 102, 255, 0.5)',
         borderColor: 'rgba(153, 102, 255, 1)',
@@ -279,7 +279,7 @@
     data: {
       labels: @json($obatData->pluck('year')),  // Pastikan ini benar
       datasets: [{
-        label: 'Jumlah Obat per Tahun',
+        label: 'Jumlah Obat',
         data: @json($obatData->pluck('count')),  // Pastikan data jumlah obat diteruskan dengan benar
         borderColor: 'rgba(255, 99, 132, 1)',
         fill: false,

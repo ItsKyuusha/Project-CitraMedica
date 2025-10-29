@@ -24,21 +24,21 @@ class AdminController extends Controller
     $jumlahObat   = Obat::count();
     
     // Data untuk chart (Misalnya, kita akan menampilkan jumlah berdasarkan tahun)
-    $dokterData = Dokter::selectRaw('YEAR(created_at) as year, count(*) as count')
-                        ->groupBy('year')
-                        ->orderBy('year')
+    $dokterData = Dokter::selectRaw('DATE(created_at) as date, count(*) as count')
+                        ->groupBy('date')
+                        ->orderBy('date')
                         ->get();
-    $pasienData = Pasien::selectRaw('YEAR(created_at) as year, count(*) as count')
-                        ->groupBy('year')
-                        ->orderBy('year')
+    $pasienData = Pasien::selectRaw('DATE(created_at) as date, count(*) as count')
+                        ->groupBy('date')
+                        ->orderBy('date')
                         ->get();
-    $poliData = Poli::selectRaw('YEAR(created_at) as year, count(*) as count')
-                    ->groupBy('year')
-                    ->orderBy('year')
+    $poliData = Poli::selectRaw('DATE(created_at) as date, count(*) as count')
+                    ->groupBy('date')
+                    ->orderBy('date')
                     ->get();
-    $obatData = Obat::selectRaw('YEAR(created_at) as year, count(*) as count')
-                    ->groupBy('year')
-                    ->orderBy('year')
+    $obatData = Obat::selectRaw('DATE(created_at) as date, count(*) as count')
+                    ->groupBy('date')
+                    ->orderBy('date')
                     ->get();
     
     return view('admin.dashboard', compact(
@@ -171,7 +171,7 @@ class AdminController extends Controller
         ]);
 
         $bulanTahun = now()->format('Ym');
-        $jumlahPasien = Pasien::whereYear('created_at', now()->year)
+        $jumlahPasien = Pasien::wheredate('created_at', now()->date)
             ->whereMonth('created_at', now()->month)
             ->count();
         $no_rm = $bulanTahun . '-' . ($jumlahPasien + 1);

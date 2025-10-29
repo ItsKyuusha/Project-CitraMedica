@@ -30,14 +30,13 @@ class DokterController extends Controller
         // Total Pemeriksaan (Jumlah Pasien Sudah dan Belum Diperiksa)
         $totalPemeriksaan = $totalSelesai + $totalBelum;
 
-        // Data untuk Chart (Contoh: Jumlah per bulan)
+        // Data untuk Chart (Contoh: Jumlah per hari)
         $dokterData = Periksa::whereHas('jadwal', function ($q) use ($dokterId) {
             $q->where('dokter_id', $dokterId);
         })
-        ->selectRaw('YEAR(updated_at) as year, MONTH(updated_at) as month, count(*) as count')
-        ->groupBy('year', 'month')
-        ->orderBy('year', 'desc')
-        ->orderBy('month', 'desc')
+        ->selectRaw('DATE(updated_at) as date, count(*) as count') // Menggunakan DATE untuk mendapatkan tanggal lengkap
+        ->groupBy('date') // Mengelompokkan berdasarkan tanggal
+        ->orderBy('date', 'desc') // Mengurutkan berdasarkan tanggal
         ->get();
 
         return view('dokter.dashboard', compact('totalSelesai', 'totalBelum', 'totalPemeriksaan', 'dokterData'));
