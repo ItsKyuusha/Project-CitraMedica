@@ -48,7 +48,7 @@ class DokterController extends Controller
     {
         $dokterId = Auth::user()->dokter->id;
 
-        $periksa = Periksa::with(['pasien', 'jadwal.dokter'])
+        $periksa = Periksa::with(['pasien', 'jadwal.dokter', 'jadwal.poli']) // Memuat relasi dokter dan poli
             ->whereHas('jadwal', function ($q) use ($dokterId) {
                 $q->where('dokter_id', $dokterId);
             })

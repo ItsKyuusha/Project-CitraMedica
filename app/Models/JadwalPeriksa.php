@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class JadwalPeriksa extends Model
 {
@@ -39,5 +40,10 @@ class JadwalPeriksa extends Model
     public function scopeAktif($query)
     {
         return $query->where('is_aktif', true);
+    }
+
+     public function poli(): BelongsTo
+    {
+        return $this->belongsTo(Poli::class, 'id');
     }
 }

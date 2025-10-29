@@ -59,6 +59,45 @@
       <div class="alert alert-success">{{ session('success') }}</div>
       @endif
 
+      <div class="row">
+        @foreach($periksa as $item)
+        <!-- Card Informasi Jadwal -->
+        <div class="col-md-8 col-sm-6 mb-4">
+            <div class="card shadow-sm rounded">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title text-center">Informasi Jadwal</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Poli:</strong> {{ optional($item->jadwal->poli)->nama ?? 'Tidak Tersedia' }}</p>
+                    <p><strong>Dokter:</strong> {{ optional($item->jadwal->dokter)->nama ?? 'Tidak Tersedia' }}</p>
+                    <p><strong>Jam Periksa:</strong> {{ $item->jadwal->jam_mulai ?? 'Tidak Tersedia' }}</p>
+                    <p><strong>Tanggal Periksa:</strong> {{ $item->jadwal->updated_at->format('d-m-Y') ?? 'Tidak Tersedia' }}</p>
+                </div>
+            </div>
+        </div>
+            <div class="col-md-4 col-sm-6 mb-4">
+            <!-- Card Antrian Pasien -->
+            <div class="card shadow-sm rounded">
+              <div class="card-header bg-primary text-white">
+                    <h5 class="card-title text-center">Antrian Saat Ini</h5>
+                </div>
+                <div class="card-body text-center">
+                    <h1 class="font-weight-bold text-center">No: {{ $item->nomor_antrian }}</h1>
+                    <h4 class="card-text text-muted">{{ $item->pasien->nama }}</h4>
+                    <p class="card-text text-muted">No: RM{{ $item->pasien->no_rm }}</p>
+                    <div class="mt-3">
+                        @if($item->status === 'selesai')
+                        <span class="badge badge-success">Selesai Diperiksa</span>
+                        @else
+                        <span class="badge badge-warning">Belum Diperiksa</span>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        </div>
+        @endforeach
+    </div>
+
       <div class="card">
         <div class="card-header">
           <h3 class="card-title">Data Pasien</h3>
@@ -67,20 +106,32 @@
           <table class="table table-bordered">
             <thead class="bg-primary text-white">
               <tr>
-                <th>No Urut</th>
+                <th>No RM</th>
                 <th>Nama Pasien</th>
                 <th>Keluhan</th>
+                <th>Status Pemeriksaan</th> <!-- Kolom baru untuk status -->
                 <th>Aksi</th>
               </tr>
             </thead>
             <tbody>
               @forelse($periksa as $item)
               <tr>
-                <td>{{ $item->nomor_antrian }}</td>
+                <td>{{ $item->pasien->no_rm }}</td>
                 <td>{{ $item->pasien->nama }}</td>
                 <td>{{ $item->keluhan ?? '-' }}</td>
+                
+                <!-- Kolom Status Pemeriksaan -->
                 <td>
-                  <button class="btn btn-sm {{ $item->status === 'selesai' ? 'btn-warning' : 'btn-primary' }}"
+                  @if($item->status === 'selesai')
+                    <span class="badge badge-success">Selesai Diperiksa</span>
+                  @else
+                    <span class="badge badge-warning">Belum Diperiksa</span>
+                  @endif
+                </td>
+
+                <!-- Kolom Aksi -->
+                <td>
+                  <button class="btn btn-sm {{ $item->status === 'selesai' ? 'btn-warning' : 'btn-primary' }} "
                     data-toggle="modal"
                     data-target="#editModal"
                     data-id="{{ $item->id }}"
@@ -96,7 +147,7 @@
               </tr>
               @empty
               <tr>
-                <td colspan="4" class="text-center">Belum ada pasien</td>
+                <td colspan="5" class="text-center">Belum ada pasien</td>
               </tr>
               @endforelse
             </tbody>
@@ -197,7 +248,7 @@
       const harga = selected.data('harga');
 
       if (id && !$('#obat-item-' + id).length) {
-        const html = `
+        const html = ` 
           <li class="list-group-item d-flex justify-content-between align-items-center" id="obat-item-${id}">
             ${nama} - Rp. ${harga.toLocaleString('id-ID')}
             <input type="hidden" name="obats[]" value="${id}">

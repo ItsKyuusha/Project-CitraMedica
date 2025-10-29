@@ -21,13 +21,10 @@ class Periksa extends Model
         'status',
     ];
 
-
     public function pasien(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'id_pasien')->with('pasien');
+        return $this->belongsTo(Pasien::class, 'id');
     }
-
-
 
     public function jadwal(): BelongsTo //Satu data model dimiliki oleh satu data dari model lain.
     {
