@@ -64,6 +64,8 @@ Route::middleware(['auth', 'role:dokter'])->group(function () {
     Route::get('/dokter', [DokterController::class, 'index'])->name('dashboardDokter');
     Route::get('/dokter/periksa', [DokterController::class, 'showPeriksa'])->name('periksaDokter');
     Route::put('/dokter/periksa/{id}', [DokterController::class, 'updatePeriksa'])->name('updatePeriksa');
+    Route::post('/dokter/periksa/next', [DokterController::class, 'nextAntrian'])->name('periksa.next');
+
 
     Route::get('/dokter/obat', [DokterController::class, 'showObat'])->name('obatDokter');
     Route::post('/dokter/obat', [DokterController::class, 'storeObat'])->name('storeObat');

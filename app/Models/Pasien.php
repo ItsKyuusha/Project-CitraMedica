@@ -24,7 +24,6 @@ class Pasien extends Model
      */
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'id'); // Pastikan 'user_id' adalah kolom yang benar
+        return $this->belongsTo(User::class, 'user_id');
     }
-
 }

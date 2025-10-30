@@ -23,8 +23,10 @@ class Periksa extends Model
 
     public function pasien(): BelongsTo
     {
-        return $this->belongsTo(Pasien::class, 'id');
+       return $this->belongsTo(User::class, 'id_pasien')->with('pasien');
+
     }
+
 
     public function jadwal(): BelongsTo //Satu data model dimiliki oleh satu data dari model lain.
     {

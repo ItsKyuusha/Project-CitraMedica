@@ -34,10 +34,10 @@ class DokterController extends Controller
         $dokterData = Periksa::whereHas('jadwal', function ($q) use ($dokterId) {
             $q->where('dokter_id', $dokterId);
         })
-        ->selectRaw('DATE(updated_at) as date, count(*) as count') // Menggunakan DATE untuk mendapatkan tanggal lengkap
-        ->groupBy('date') // Mengelompokkan berdasarkan tanggal
-        ->orderBy('date', 'desc') // Mengurutkan berdasarkan tanggal
-        ->get();
+            ->selectRaw('DATE(updated_at) as date, count(*) as count') // Menggunakan DATE untuk mendapatkan tanggal lengkap
+            ->groupBy('date') // Mengelompokkan berdasarkan tanggal
+            ->orderBy('date', 'desc') // Mengurutkan berdasarkan tanggal
+            ->get();
 
         return view('dokter.dashboard', compact('totalSelesai', 'totalBelum', 'totalPemeriksaan', 'dokterData'));
     }
@@ -45,19 +45,26 @@ class DokterController extends Controller
     // === Tampilkan Daftar Pemeriksaan (untuk dokter yang login) ===
     public function showPeriksa()
     {
-        $dokterId = Auth::user()->dokter->id;
+        $dokterId = auth()->user()->dokter->id;
 
-        $periksa = Periksa::with(['pasien', 'jadwal.dokter', 'jadwal.poli']) // Memuat relasi dokter dan poli
-            ->whereHas('jadwal', function ($q) use ($dokterId) {
-                $q->where('dokter_id', $dokterId);
-            })
-            ->latest()
+        // Ambil pasien yang belum diperiksa (antrian terdepan)
+        $antrianSekarang = Periksa::with(['pasien', 'jadwal.dokter', 'jadwal.poli'])
+            ->whereHas('jadwal', fn($q) => $q->where('dokter_id', $dokterId))
+            ->where('status', '!=', 'selesai')
+            ->orderBy('nomor_antrian', 'asc')
+            ->first();
+
+        // Ambil semua pasien dokter (baik sudah maupun belum)
+        $periksa = Periksa::with(['pasien', 'jadwal.dokter', 'jadwal.poli'])
+            ->whereHas('jadwal', fn($q) => $q->where('dokter_id', $dokterId))
+            ->orderBy('nomor_antrian', 'asc')
             ->get();
 
         $obats = Obat::all();
 
-        return view('dokter.periksa', compact('periksa', 'obats'));
+        return view('dokter.periksa', compact('antrianSekarang', 'periksa', 'obats'));
     }
+
 
     // === Tampilkan Form Edit Pemeriksaan ===
     public function editPeriksa($id)
@@ -99,6 +106,25 @@ class DokterController extends Controller
 
         return redirect()->route('periksaDokter')->with('success', 'Pemeriksaan berhasil diperbarui.');
     }
+    public function nextAntrian(Request $request)
+    {
+        $dokterId = auth()->user()->dokter->id;
+
+        // Ambil antrian teratas yang belum diperiksa
+        $antrianSekarang = Periksa::whereHas('jadwal', fn($q) => $q->where('dokter_id', $dokterId))
+            ->where('status', '!=', 'selesai')
+            ->orderBy('nomor_antrian', 'asc')
+            ->first();
+
+        if ($antrianSekarang) {
+            // Tandai pasien ini sebagai "tidak hadir"
+            $antrianSekarang->update(['status' => 'tidak hadir']);
+        }
+
+        // Arahkan ke pasien berikutnya (otomatis tampil di showPeriksa)
+        return redirect()->route('periksaDokter')->with('info', 'Pasien dilewati. Menampilkan antrian berikutnya.');
+    }
+
 
     // === CRUD Obat ===
     public function showObat()

@@ -56,47 +56,59 @@
   <section class="content">
     <div class="container-fluid">
       @if(session('success'))
+      
       <div class="alert alert-success">{{ session('success') }}</div>
+      <div class="alert alert-warning">{{ session('info') }}</div>
       @endif
 
       <div class="row">
-        @foreach($periksa as $item)
+        @if($antrianSekarang)
         <!-- Card Informasi Jadwal -->
         <div class="col-md-8 col-sm-6 mb-4">
-            <div class="card shadow-sm rounded">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="card-title text-center">Informasi Jadwal</h5>
-                </div>
-                <div class="card-body">
-                    <p><strong>Poli:</strong> {{ optional($item->jadwal->poli)->nama ?? 'Tidak Tersedia' }}</p>
-                    <p><strong>Dokter:</strong> {{ optional($item->jadwal->dokter)->nama ?? 'Tidak Tersedia' }}</p>
-                    <p><strong>Jam Periksa:</strong> {{ $item->jadwal->jam_mulai ?? 'Tidak Tersedia' }}</p>
-                    <p><strong>Tanggal Periksa:</strong> {{ $item->jadwal->updated_at->format('d-m-Y') ?? 'Tidak Tersedia' }}</p>
-                </div>
+          <div class="card shadow-sm rounded">
+            <div class="card-header bg-primary text-white">
+              <h5 class="card-title text-center">Informasi Jadwal</h5>
             </div>
-        </div>
-            <div class="col-md-4 col-sm-6 mb-4">
-            <!-- Card Antrian Pasien -->
-            <div class="card shadow-sm rounded">
-              <div class="card-header bg-primary text-white">
-                    <h5 class="card-title text-center">Antrian Saat Ini</h5>
-                </div>
-                <div class="card-body text-center">
-                    <h1 class="font-weight-bold text-center">No: {{ $item->nomor_antrian }}</h1>
-                    <h4 class="card-text text-muted">{{ $item->pasien->nama }}</h4>
-                    <p class="card-text text-muted">No: RM{{ $item->pasien->no_rm }}</p>
-                    <div class="mt-3">
-                        @if($item->status === 'selesai')
-                        <span class="badge badge-success">Selesai Diperiksa</span>
-                        @else
-                        <span class="badge badge-warning">Belum Diperiksa</span>
-                        @endif
-                    </div>
-                </div>
+            <div class="card-body">
+              <p><strong>Poli:</strong> {{ optional($antrianSekarang->jadwal->dokter->poli)->nama ?? 'Tidak Tersedia' }}</p>
+              <p><strong>Dokter:</strong> {{ optional($antrianSekarang->jadwal->dokter)->nama ?? 'Tidak Tersedia' }}</p>
+              <p><strong>Jam Periksa:</strong> {{ $antrianSekarang->jadwal->jam_mulai ?? 'Tidak Tersedia' }}</p>
+              <p><strong>Tanggal Periksa:</strong> {{ $antrianSekarang->jadwal->updated_at->format('d-m-Y') ?? 'Tidak Tersedia' }}</p>
             </div>
+          </div>
         </div>
-        @endforeach
-    </div>
+
+        <!-- Card Antrian Pasien -->
+        <div class="col-md-4 col-sm-6 mb-4">
+          <div class="card shadow-sm rounded">
+            <div class="card-header bg-primary text-white">
+              <h5 class="card-title text-center">Antrian Saat Ini</h5>
+            </div>
+            <div class="card-body text-center">
+              <h1 class="font-weight-bold text-center">No: {{ $antrianSekarang->nomor_antrian }}</h1>
+              <h4 class="card-text text-muted">{{ $antrianSekarang->pasien->nama }}</h4>
+              <p class="card-text text-muted">No: RM{{ $antrianSekarang->pasien->pasien->no_rm ?? "-"}}</p>
+              <div class="mt-3">
+                <span class="badge badge-warning">Belum Diperiksa</span>
+                <form action="{{ route('periksa.next') }}" method="POST" onsubmit="return confirm('Lewati pasien ini dan lanjut ke berikutnya?');">
+                  @csrf
+                  <button type="submit" class="btn btn-danger btn-sm mt-2">
+                    <i class="fas fa-forward"></i> Next Antrian
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+        @else
+        <div class="col-12">
+          <div class="alert alert-info text-center">
+            Tidak ada pasien dalam antrian saat ini.
+          </div>
+        </div>
+        @endif
+      </div>
+
 
       <div class="card">
         <div class="card-header">
@@ -116,16 +128,18 @@
             <tbody>
               @forelse($periksa as $item)
               <tr>
-                <td>{{ $item->pasien->no_rm }}</td>
+
+                <td>{{ $item->pasien->pasien->no_rm ?? '-' }}</td>
+
                 <td>{{ $item->pasien->nama }}</td>
                 <td>{{ $item->keluhan ?? '-' }}</td>
-                
+
                 <!-- Kolom Status Pemeriksaan -->
                 <td>
                   @if($item->status === 'selesai')
-                    <span class="badge badge-success">Selesai Diperiksa</span>
+                  <span class="badge badge-success">Selesai Diperiksa</span>
                   @else
-                    <span class="badge badge-warning">Belum Diperiksa</span>
+                  <span class="badge badge-warning">Belum Diperiksa</span>
                   @endif
                 </td>
 
