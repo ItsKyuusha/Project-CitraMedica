@@ -66,6 +66,9 @@ class DokterController extends Controller
     }
 
 
+
+
+
     // === Tampilkan Form Edit Pemeriksaan ===
     public function editPeriksa($id)
     {
@@ -110,35 +113,41 @@ class DokterController extends Controller
     {
         $dokterId = auth()->user()->dokter->id;
 
-        // Ambil pasien aktif yang sedang menunggu
-        $antrianSekarang = Periksa::whereHas('jadwal', fn($q) => $q->where('dokter_id', $dokterId))
+        // Ambil pasien aktif (yang sedang menunggu dan paling depan)
+        $antrianSekarang = Periksa::whereHas(
+            'jadwal',
+            fn($q) =>
+            $q->where('dokter_id', $dokterId)
+        )
             ->where('status', 'menunggu')
             ->orderBy('nomor_antrian', 'asc')
             ->first();
 
         if ($antrianSekarang) {
-            // Tandai pasien ini sebagai "tidak hadir"
+            // Tandai pasien ini sebagai "tidak hadir" (dilewati)
             $antrianSekarang->update(['status' => 'tidak hadir']);
         }
 
-        // Ambil pasien berikutnya (status = menunggu, nomor antrian lebih besar)
-        $nextAntrian = Periksa::whereHas('jadwal', fn($q) => $q->where('dokter_id', $dokterId))
+        // Cari pasien berikutnya yang masih menunggu (nomor lebih besar)
+        $nextAntrian = Periksa::whereHas(
+            'jadwal',
+            fn($q) =>
+            $q->where('dokter_id', $dokterId)
+        )
             ->where('status', 'menunggu')
             ->where('nomor_antrian', '>', $antrianSekarang->nomor_antrian ?? 0)
             ->orderBy('nomor_antrian', 'asc')
             ->first();
 
-        // Jika tidak ada pasien berikutnya, berarti antrian habis
+        // Kalau tidak ada pasien berikutnya, berarti semua sudah dipanggil atau diperiksa
         if (!$nextAntrian) {
-            // Reset semua status ke 'menunggu' agar bisa berulang dari awal
-            Periksa::whereHas('jadwal', fn($q) => $q->where('dokter_id', $dokterId))
-                ->whereIn('status', ['selesai', 'tidak hadir'])
-                ->update(['status' => 'menunggu']);
-
-            return redirect()->route('periksaDokter')->with('info', 'Antrian telah selesai, memulai dari awal lagi.');
+            return redirect()->route('periksaDokter')
+                ->with('info', 'Semua pasien sudah dipanggil atau diperiksa.');
         }
 
-        return redirect()->route('periksaDokter')->with('info', 'Pasien dilewati. Menampilkan antrian berikutnya.');
+        // Redirect agar halaman showPeriksa menampilkan pasien berikutnya
+        return redirect()->route('periksaDokter')
+            ->with('info', 'Pasien dilewati. Menampilkan antrian berikutnya.');
     }
 
 
