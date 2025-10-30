@@ -47,14 +47,14 @@ class DokterController extends Controller
     {
         $dokterId = auth()->user()->dokter->id;
 
-        // Ambil pasien yang belum diperiksa (antrian terdepan)
+        // Ambil pasien yang masih menunggu (belum diperiksa dan tidak dilewati)
         $antrianSekarang = Periksa::with(['pasien', 'jadwal.dokter', 'jadwal.poli'])
             ->whereHas('jadwal', fn($q) => $q->where('dokter_id', $dokterId))
-            ->where('status', '!=', 'selesai')
+            ->where('status', 'menunggu')
             ->orderBy('nomor_antrian', 'asc')
             ->first();
 
-        // Ambil semua pasien dokter (baik sudah maupun belum)
+        // Semua pasien untuk tabel (supaya tetap bisa ditampilkan)
         $periksa = Periksa::with(['pasien', 'jadwal.dokter', 'jadwal.poli'])
             ->whereHas('jadwal', fn($q) => $q->where('dokter_id', $dokterId))
             ->orderBy('nomor_antrian', 'asc')
@@ -110,9 +110,9 @@ class DokterController extends Controller
     {
         $dokterId = auth()->user()->dokter->id;
 
-        // Ambil antrian teratas yang belum diperiksa
+        // Ambil pasien aktif yang sedang menunggu
         $antrianSekarang = Periksa::whereHas('jadwal', fn($q) => $q->where('dokter_id', $dokterId))
-            ->where('status', '!=', 'selesai')
+            ->where('status', 'menunggu')
             ->orderBy('nomor_antrian', 'asc')
             ->first();
 
@@ -121,9 +121,26 @@ class DokterController extends Controller
             $antrianSekarang->update(['status' => 'tidak hadir']);
         }
 
-        // Arahkan ke pasien berikutnya (otomatis tampil di showPeriksa)
+        // Ambil pasien berikutnya (status = menunggu, nomor antrian lebih besar)
+        $nextAntrian = Periksa::whereHas('jadwal', fn($q) => $q->where('dokter_id', $dokterId))
+            ->where('status', 'menunggu')
+            ->where('nomor_antrian', '>', $antrianSekarang->nomor_antrian ?? 0)
+            ->orderBy('nomor_antrian', 'asc')
+            ->first();
+
+        // Jika tidak ada pasien berikutnya, berarti antrian habis
+        if (!$nextAntrian) {
+            // Reset semua status ke 'menunggu' agar bisa berulang dari awal
+            Periksa::whereHas('jadwal', fn($q) => $q->where('dokter_id', $dokterId))
+                ->whereIn('status', ['selesai', 'tidak hadir'])
+                ->update(['status' => 'menunggu']);
+
+            return redirect()->route('periksaDokter')->with('info', 'Antrian telah selesai, memulai dari awal lagi.');
+        }
+
         return redirect()->route('periksaDokter')->with('info', 'Pasien dilewati. Menampilkan antrian berikutnya.');
     }
+
 
 
     // === CRUD Obat ===

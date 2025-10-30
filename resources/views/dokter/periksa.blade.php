@@ -56,8 +56,9 @@
   <section class="content">
     <div class="container-fluid">
       @if(session('success'))
-      
       <div class="alert alert-success">{{ session('success') }}</div>
+      @endif
+      @if(session('info'))
       <div class="alert alert-warning">{{ session('info') }}</div>
       @endif
 
